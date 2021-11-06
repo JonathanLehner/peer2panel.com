@@ -1,0 +1,19 @@
+.render-actions__ActionsWrapper-dp6lnv-0 {
+    height: 20px !important;
+    bottom: 60px !important;
+}
+
+.disconnected-view__SVGWrapper-sc-1hdjm8z-0 {
+    top: 80px;
+    position: absolute;
+}
+
+html { font-size: calc(1em + 0.1vw); }
+
+.dot {
+    height: 15px;
+    width: 15px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+  }

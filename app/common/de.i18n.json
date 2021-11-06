@@ -1,0 +1,13 @@
+	{
+	"_namespace": "Common",
+	"_locale": "de-CH",
+	"userName": "Nutzername",
+	"ok": "gut",
+	"profile": "Profil",
+	"loggedInAs": "Angemeldet als",
+	"signOut": "Abmelden",
+	"access": "Öffnen",
+	"settings": "Einstellungen",
+	"about": "Über",
+	"intro":"VideoWG ist am besten."
+	}

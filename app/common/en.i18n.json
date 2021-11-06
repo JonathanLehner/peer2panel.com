@@ -1,0 +1,14 @@
+{
+	"_namespace": "Common",
+	"_locale": "en-US",
+	"userName": "User name",
+	"ok": "ok",
+	"profile": "Profile",
+	"loggedInAs": "Logged in as",
+	"signOut": "Sign Out",
+	"access": "Access",
+	"settings": "Settings",
+	"about": "About",
+	"intro":"VideoWG is the best"
+}
+

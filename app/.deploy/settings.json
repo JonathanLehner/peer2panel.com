@@ -1,0 +1,6 @@
+{
+  "public": {
+    "baseURL": "https://solarinvest.jonathanlehner.com",
+    "isProduction": true
+  }
+}
