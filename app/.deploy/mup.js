@@ -3,20 +3,21 @@ module.exports = {
   servers: {
     one: {
       // TODO: set host address, username, and authentication method
-      host: '143.198.215.99',
+      host: '167.172.191.194',
       username: 'root',
       pem: '~/.ssh/id_rsa'
     }
   },
 
   app: {
-    name: 'solarinvest',
+    name: 'Peer2Panel',
     path: '../',
 
     servers: {
       one: {},
     },
 
+    // does not build mobile apps apparently?
     buildOptions: {
       serverOnly: true,
     },
@@ -24,7 +25,7 @@ module.exports = {
     env: {
       // TODO: Change to your app's url
       // If you are using ssl, it needs to start with https://
-      ROOT_URL: "https://solarinvest.jonathanlehner.com",
+      ROOT_URL: "https://app.peer2panel.com",
       MONGO_URL: 'mongodb+srv://dbUser:j5fHHFHEon3bGuLk@cluster0.5j1cz.mongodb.net/myFirstDatabase',
       //MONGO_OPLOG_URL: 'mongodb://mongodb/local',
       
@@ -34,7 +35,7 @@ module.exports = {
 
     docker: {
       // change to 'abernix/meteord:base' if your app is using Meteor 1.4 - 1.5
-      image: 'abernix/meteord:node-12.14.0-base',
+      image: 'abernix/meteord:node-12-base',
       //buildInstructions: [
       //  'RUN apt-get install -y gconf-service libasound2 libatk1.0-0 libatk-bridge2.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget'
       //]
@@ -70,7 +71,7 @@ module.exports = {
   // app when there are several apps
 
   proxy: {
-    domains: 'solarinvest.jonathanlehner.com',
+    domains: 'app.peer2panel.com',
     ssl: {
       // Enable let's encrypt to create free certificates.
       // The email is used by Let's Encrypt to notify you when the
