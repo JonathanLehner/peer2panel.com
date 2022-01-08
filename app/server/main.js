@@ -1,6 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import '/common/collections.js';
 import './methods.js';
+import './api';
+import './limitorder';
+import './split';
+const algosdk = require('algosdk');
 
 Meteor.startup(() => {
     if(Users.find().fetch().length == 1){

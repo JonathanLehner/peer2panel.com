@@ -13,23 +13,28 @@ function NavBar (props) {
     return (
       <Navbar bg="light" expand="lg">
         <Navbar.Brand>
-          <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/">SolarInvest</Nav.Link>
+          <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/">
+            <img src={"/peer2panel_logo.jpg"} style={{height: "80px"}}/>
+          </Nav.Link>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
-            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/profile">Profile</Nav.Link>
-            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/search">Search</Nav.Link>
-            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/applications">Applications</Nav.Link>
-            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/settings">Settings</Nav.Link>
+            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/about">About</Nav.Link>
+            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/trade">Trade</Nav.Link>
+            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/mint">Mint</Nav.Link>
+            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/assets">Assets</Nav.Link>
           </Nav>
         </Navbar.Collapse>
-        <Navbar.Collapse className="justify-content-end" style={{paddingRight: "0px"}}>
+        {/*<Navbar.Collapse className="justify-content-end" style={{paddingRight: "0px"}}>
           <AccountsUIWrapper />
-        </Navbar.Collapse>
+        </Navbar.Collapse>*/}
         <Navbar.Collapse className="justify-content-end" style={{paddingRight: "0px"}}>
           <div style={{marginLeft: "0px"}}>
             <LanguageSelector />
+          </div>
+          <div>
+            <button id="btnRefreshAccounts">Authenticate</button>
           </div>
         </Navbar.Collapse>
       </Navbar>

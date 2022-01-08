@@ -1,9 +1,23 @@
 <head>
   <meta charset="UTF-8" />  
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>VideoWG</title>
+  <title>Peer2Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.2/css/bulma.min.css"
+  integrity="sha512-byErQdWdTqREz6DLAA9pCnLbdoGGhXfU6gm1c8bkf7F51JVmUBlayGe2A31VpXWQP+eiJ3ilTAZHCR3vmMyybA=="
+  crossorigin="anonymous" />
 </head>
 
 <body>
+  <div id="divAlgoSignerCheck" class="is-hidden">
+    <h1 class="title">AlgoSigner not installed!</h1>
+    <p class="subtitle">
+      You don't appear to have AlgoSigner installed! You can get it from the <a target="_blank"
+        href="https://chrome.google.com/webstore/detail/algosigner/kmmolakhbgdlpkjkcjkebenjheonagdm">Chrome Web
+        Store</a>.
+    </p>
+  </div>
   <div id="react-target"></div>
+  <script defer="" src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <script src="static/js/site.js"></script>
+  <script src="static/js/algosignerutils.js"></script>
 </body>

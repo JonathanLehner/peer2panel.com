@@ -7,11 +7,10 @@
       Link,
       Redirect
     } from "react-router-dom";
-  import UserProfile from './UserProfile.jsx';
-  import RoomDetail from './RoomDetail.jsx';
-  import SearchPage from './SearchPage.jsx';
-  import Applications from './Applications.jsx';
-  import Settings from './Settings.jsx';
+  import About from './About.jsx';
+  import Trade from './Trade.jsx';
+  import Mint from './Mint.jsx';
+  import Assets from './Assets.jsx';
 
   function RouteSwitch(props) {
       return (
@@ -20,23 +19,21 @@
                   Please log in
               </Route>
               <Route exact path="/">
-                <Redirect to="/search" />
+                <Redirect to="/about" />
               </Route>
-              <PrivateRoute exact path="/profile">
-                <UserProfile {...props} />
-              </PrivateRoute>
-              <PrivateRoute exact path="/room/:id">
-                <RoomDetail {...props} />
-              </PrivateRoute>
-              <PrivateRoute exact path="/search">
-                <SearchPage {...props} />
-              </PrivateRoute>
-              <PrivateRoute exact path="/applications">
-                <Applications {...props} />
-              </PrivateRoute>
-              <PrivateRoute exact path="/settings">
-                <Settings {...props} />
-              </PrivateRoute>
+              <Route exact path="/about">
+                <About {...props} />
+              </Route>
+              <Route exact path="/trade">
+                <Trade {...props} />
+              </Route>
+              <Route exact path="/mint">
+                <Mint {...props} />
+              </Route>
+              <Route exact path="/assets">
+                <Assets {...props} />
+              </Route>
+
           </Switch>
       )
     }

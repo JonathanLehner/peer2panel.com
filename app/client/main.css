@@ -2,3 +2,18 @@ body {
   padding: 10px;
   font-family: sans-serif;
 }
+
+table {
+  table-layout: fixed;
+  margin-bottom: 20px;
+}
+
+table td, th{
+  padding: 5px; 
+  width: 200px; 
+  overflow: hidden;
+}
+
+.flags{
+  height: 16px;
+}

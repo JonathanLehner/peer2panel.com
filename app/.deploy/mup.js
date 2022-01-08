@@ -25,8 +25,9 @@ module.exports = {
     env: {
       // TODO: Change to your app's url
       // If you are using ssl, it needs to start with https://
-      ROOT_URL: "https://app.peer2panel.com",
+      ROOT_URL: "https://demo.peer2panel.com",
       MONGO_URL: 'mongodb+srv://dbUser:j5fHHFHEon3bGuLk@cluster0.5j1cz.mongodb.net/myFirstDatabase',
+      PORT: 3009,  
       //MONGO_OPLOG_URL: 'mongodb://mongodb/local',
       
       // MONGO_URL: 'mongodb+srv://Milliways:Bistromath.42@cluster0-vovky.mongodb.net/test',
@@ -51,7 +52,7 @@ module.exports = {
     // Add 30 seconds if the server has 512mb of ram
     // And 30 more if you have binary npm dependencies.
     deployCheckWaitTime: 60,
-    // deployCheckPort: 3011,
+    deployCheckPort: 3009,
 
     // Show progress bar while uploading bundle to server
     // You might need to disable it on CI servers
@@ -71,7 +72,7 @@ module.exports = {
   // app when there are several apps
 
   proxy: {
-    domains: 'app.peer2panel.com',
+    domains: 'demo.peer2panel.com',
     ssl: {
       // Enable let's encrypt to create free certificates.
       // The email is used by Let's Encrypt to notify you when the

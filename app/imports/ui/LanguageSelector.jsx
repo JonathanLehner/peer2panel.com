@@ -5,8 +5,8 @@ import Flag from 'react-world-flags'
 import i18n from 'meteor/universe:i18n';
 const T = i18n.createComponent();
 
-const EnglishFlag = <span><Flag code={ "US" } height="16" /> English</span>
-const GermanFlag = <span><Flag code={ "CH" } height="16" /> German</span>
+const EnglishFlag = <span><Flag className="flags" code={ "US" } height="16px" /></span>
+const GermanFlag = <span><Flag className="flags" code={ "DE" } height="16px" /></span>
 const options = [
     { value: 'en-US', label: EnglishFlag },
     { value: 'de-CH', label: GermanFlag },
@@ -35,7 +35,7 @@ class LanguageSelector extends React.Component{
             <div>
                 <div style={
                     {
-                    width: "200px", 
+                    width: "100px", 
                     margin: "10px",
                     position: "relative"
                     }
