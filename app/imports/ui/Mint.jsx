@@ -162,7 +162,7 @@ function signAndSendTransaction() {
         assetUnitName: assetUnit,
         assetTotal: +assetTotal,
         assetDecimals: +assetDecimals,
-        note: assetNote,
+        note: algosdk.encodeObj(assetNote),
         type: 'acfg', // ASA Configuration (acfg)
         fee: txParams['min-fee'],
         firstRound: txParams['last-round'],
