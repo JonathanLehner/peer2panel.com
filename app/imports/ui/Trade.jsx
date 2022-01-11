@@ -7,14 +7,15 @@ export default class Trade extends Component {
   state = {
     counter: 0,
     dexData: [
-      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 1", price: "80"},
-      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 1", price: "88"},
-      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 5", price: "85"},
-      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 3", price: "80"},
-      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 7", price: "83"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 1", price: "80", rent: "10"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 1", price: "88", rent: "11"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 5", price: "85", rent: "14"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 3", price: "80", rent: "10"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 7", price: "83", rent: "12"},
     ],
     priceField_value: 0,
-    selectedIndex: -1
+    selectedIndex: -1,
+    isListing: false
   }
 
   componentDidMount(){
@@ -30,7 +31,15 @@ export default class Trade extends Component {
   }
 
   select(index){
-    this.setState({selectedIndex: index, priceField_value: this.state.dexData[index].price})
+    this.setState({isListing: false, selectedIndex: index, priceField_value: this.state.dexData[index].price})
+  }
+
+  openListing(){
+    this.setState({isListing: true, selectedIndex: -1});
+  }
+
+  cancelPurchase(){
+    this.setState({selectedIndex: -1});
   }
 
   render() {
@@ -48,18 +57,26 @@ export default class Trade extends Component {
               </p>
               <table>
                 <tbody>
-                  <tr><th>Owner</th><th>Asset name</th><th>Price (USDC)</th><th></th></tr>
+                  <tr><th>Owner</th><th>Asset name</th><th>Rent per month (USDC)</th><th>Asking price (USDC)</th><th></th></tr>
                   {this.state.dexData.map((dexEntry, index) => {
-                    return <tr key={index}><td>{dexEntry.address}</td><td>{dexEntry.location}</td><td>{dexEntry.price}</td><td><a onClick={()=>this.select(index)}>select</a></td></tr>
+                    return <tr style={this.state.selectedIndex == index?{background: "gray"}:{}} key={index}><td>{dexEntry.address}</td><td>{dexEntry.location}</td><td>{dexEntry.rent}</td><td>{dexEntry.price}</td><td><a style={{textDecoration: "underline"}} onClick={()=>this.select(index)}>buy</a></td></tr>
                   })}
                 </tbody>
               </table>
+              <div style={{padding: "20px"}}>
+                <button className="button" id="btnList" onClick={()=>this.openListing()}>List a PV token</button>
+                {this.state.isListing == false ? "" :
+                  <div>
+                    Put listing price
+                  </div>
+                  }
+              </div>
 
               {this.state.selectedIndex == -1 ? "" : 
-                  <div>{this.props.accountsData == null ? 
-                    <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate</button>
+                  <div style={{padding: "20px"}}>{this.props.accountsData == null ? 
+                    <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate to buy</button>
                     : <div>
-                    <div className="columns">
+                    <div className="columns" style={{border: "solid thin grey"}}>
                       <div className="column">
                         <div className="field is-horizontal">
                           <div className="field-label is-normal">
@@ -101,7 +118,8 @@ export default class Trade extends Component {
                         </div>
                       </div>
                     </div>
-                    <button onClick={()=>{executePVTransaction()}} className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and list</button>
+                    <button onClick={()=>{executePVTransaction()}} className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and buy</button>
+                    <a style={{textDecoration: "underline"}} onClick={()=>this.cancelPurchase()}>Cancel</a>
                   </div>
                     }
                 </div>}
