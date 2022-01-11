@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import {
@@ -9,7 +9,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import LanguageSelector from './LanguageSelector';
 
 function NavBar (props) {
-    const {isLoggedIn, username, openLoginModal, logout} = props;
+    const {isLoggedIn, username, openLoginModal, logout, accountsData, fetchAcc} = props;
+    console.log(accountsData)
     return (
       <Navbar bg="light" expand="lg">
         <Navbar.Brand>
@@ -23,6 +24,7 @@ function NavBar (props) {
             <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/about">About</Nav.Link>
             <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/trade">Trade</Nav.Link>
             <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/mint">Mint</Nav.Link>
+            <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/rent">Rent</Nav.Link>
             <Nav.Link as={NavLink} exact activeClassName="activeNav" to="/assets">Assets</Nav.Link>
           </Nav>
         </Navbar.Collapse>
@@ -34,7 +36,13 @@ function NavBar (props) {
             <LanguageSelector />
           </div>
           <div>
-            <button id="btnRefreshAccounts">Authenticate</button>
+            {props.accountsData == null ? 
+            <button className="button" id="btnRefreshAccounts" onClick={fetchAcc}>Authenticate</button>
+            : <div>
+                Authenticated: <br/>
+                {props.accountsData[0].address}
+              </div>
+            }
           </div>
         </Navbar.Collapse>
       </Navbar>

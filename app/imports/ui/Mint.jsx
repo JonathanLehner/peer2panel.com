@@ -1,19 +1,13 @@
 import React, { Component } from 'react';
 const algosdk = require("algosdk");
+import Dialogs from './Dialogs.jsx';
 
 export default class Mint extends Component {
   state = {
     counter: 0,
   }
 
-  increment() {
-    this.setState({
-      counter: this.state.counter + 1
-    });
-  }
-
   componentDidMount(){
-    document.getElementById('btnRefreshAccounts').addEventListener('click', fetchAccounts);
     document.getElementById('btnSignAndSend').addEventListener('click', signAndSendTransaction);
 
     var closeButtonElements = document.getElementsByClassName('delete');
@@ -31,24 +25,7 @@ export default class Mint extends Component {
       <div>
         <section className="section">
           <div className="container">
-            <article id="successDialog" className="message is-success is-hidden">
-              <div className="message-header">
-                <p>Success</p>
-                <button className="delete" aria-label="delete"></button>
-              </div>
-              <div className="message-body">
-                <span id="successMessage"></span>
-              </div>
-            </article>
-            <article id="errorDialog" className="message is-danger is-hidden">
-              <div className="message-header">
-                <p>Error</p>
-                <button className="delete" aria-label="delete"></button>
-              </div>
-              <div className="message-body">
-                An error occurred: <span id="errorMessage"></span>
-              </div>
-            </article>
+            <Dialogs/>
 
             <div id="divDemoBlock" className="">
               <h1 className="title">NFT minting</h1>
@@ -154,18 +131,9 @@ export default class Mint extends Component {
                   </div>
                 </div>
               </div>
-              <button className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and Send</button>
+              <button className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and mint</button>
 
              
-            </div>
-          </div>
-          <div className="modal" id="processingModal">
-            <div className="modal-background"></div>
-            <div className="modal-content">
-              <div className="box">
-                <span id="processingMessage">Processing, please wait...</span>
-                <progress className="progress is-small is-primary mt-1" max="100">15%</progress>
-              </div>
             </div>
           </div>
         </section>
@@ -175,29 +143,6 @@ export default class Mint extends Component {
 }
 
 //////////////
-
-function fetchAccounts() {
-  showProcessingModal("Please wait...");
-
-  let paymentAccountSelect = document.getElementById('paymentAccountField');
-
-  renderLoadingSelect(paymentAccountSelect);
-
-  AlgoSigner.connect()
-    // fetch accounts
-    .then(() => AlgoSigner.accounts({
-      ledger: 'TestNet'
-    }))
-    // populate account dropdowns
-    .then((accountsData) => {
-      renderAccountSelect(paymentAccountSelect, accountsData);
-      hideProcessingModal();
-    })
-    .catch((e) => {
-      handleClientError(e.message);
-      hideProcessingModal();
-    });
-}    
 
 function signAndSendTransaction() {
   showProcessingModal("Sending transaction...");

@@ -90,10 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     //document.body.style.position = "";
   }
   
-  function updateMicroAlgoConverter(microAlgoValue) {
-    document.getElementById('microToAlgo').innerHTML = `${microAlgosToAlgos(microAlgoValue)} Algos`;
-  }
-  
   function microAlgosToAlgos(numMicroAlgos) {
     return (numMicroAlgos / 1000000).toFixed(6);
   }

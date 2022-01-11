@@ -10,6 +10,7 @@
   import About from './About.jsx';
   import Trade from './Trade.jsx';
   import Mint from './Mint.jsx';
+  import Rent from './Rent.jsx';
   import Assets from './Assets.jsx';
 
   function RouteSwitch(props) {
@@ -30,6 +31,9 @@
               <Route exact path="/mint">
                 <Mint {...props} />
               </Route>
+              <Route exact path="/rent">
+                <Rent {...props} />
+              </Route>
               <Route exact path="/assets">
                 <Assets {...props} />
               </Route>
@@ -39,24 +43,3 @@
     }
   
   export default RouteSwitch;
-  
-  function PrivateRoute({ children, ...rest }) {
-      const isAuthenticated = !!Meteor.userId();
-      return (
-        <Route
-          {...rest}
-          render={({ location }) =>
-              isAuthenticated ? (
-              children
-            ) : (
-              <Redirect
-                to={{
-                  pathname: "/login",
-                  state: { from: location }
-                }}
-              />
-            )
-          }
-        />
-      );
-    }

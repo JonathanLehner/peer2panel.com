@@ -3,7 +3,7 @@ module.exports = {
   servers: {
     one: {
       // TODO: set host address, username, and authentication method
-      host: '167.172.191.194',
+      host: '104.248.22.84',
       username: 'root',
       pem: '~/.ssh/id_rsa'
     }

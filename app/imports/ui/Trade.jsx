@@ -1,45 +1,23 @@
 import React, { Component } from 'react';
 const algosdk = require("algosdk");
+import './trade.css';
+import Dialogs from './Dialogs.jsx';
 
 export default class Trade extends Component {
   state = {
     counter: 0,
-  }
-
-  increment() {
-    this.setState({
-      counter: this.state.counter + 1
-    });
+    dexData: [
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 1", price: "80"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 1", price: "88"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 5", price: "85"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 3", price: "80"},
+      {address: "PGPN6HSIXJT73IHLCSAH", location: "PV Zurich 7", price: "83"},
+    ],
+    priceField_value: 0,
+    selectedIndex: -1
   }
 
   componentDidMount(){
-    
-    let select1 = document.getElementById("select1")
-    let select2 = document.getElementById("select2")
-    let select3 = document.getElementById("select3")
-    let select4 = document.getElementById("select4")
-    let select5 = document.getElementById("select5")
-    let priceField = document.getElementById("priceField")
-
-    console.log(select1);
-    select1.addEventListener("click", function () {
-      priceField.value = 80
-    });
-    select2.addEventListener("click", function () {
-      priceField.value = 88
-    });
-    select3.addEventListener("click", function () {
-      priceField.value = 85
-    });
-    select4.addEventListener("click", function () {
-      priceField.value = 80
-    });
-    select5.addEventListener("click", function () {
-      priceField.value = 83
-    });
-
-    document.getElementById('btnRefreshAccounts').addEventListener('click', fetchAccounts);
-    document.getElementById('btnSignAndSend').addEventListener('click', executePVTransaction);
 
     var closeButtonElements = document.getElementsByClassName('delete');
   
@@ -51,128 +29,152 @@ export default class Trade extends Component {
     
   }
 
+  select(index){
+    this.setState({selectedIndex: index, priceField_value: this.state.dexData[index].price})
+  }
+
   render() {
     return (
       <div>
         <section className="section">
           <div className="container">
-            <article id="successDialog" className="message is-success is-hidden">
-              <div className="message-header">
-                <p>Success</p>
-                <button className="delete" aria-label="delete"></button>
-              </div>
-              <div className="message-body">
-                <span id="successMessage"></span>
-              </div>
-            </article>
-            <article id="errorDialog" className="message is-danger is-hidden">
-              <div className="message-header">
-                <p>Error</p>
-                <button className="delete" aria-label="delete"></button>
-              </div>
-              <div className="message-body">
-                An error occurred: <span id="errorMessage"></span>
-              </div>
-            </article>
+            <Dialogs />
 
             <div id="divDemoBlock" className="">
-              <h1 className="title">PV NFT marketplace</h1>
+              <h1 className="title">PV token marketplace</h1>
 
               <p className="subtitle">
-                Pay Algos to another investor, get 1 Photolvoltaic (PV) token.
+                Pay USDC to another investor, to get Photolvoltaic (PV) NFTs. Or sell your own PV tokens.
               </p>
               <table>
-                <tr><th>Owner</th><th>Asset name</th><th>Price</th><th></th></tr>
-                <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 1</td><td>80</td><td><a id="select1">select</a></td></tr>
-                <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 1</td><td>88</td><td><a id="select2">select</a></td></tr>
-                <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 5</td><td>85</td><td><a id="select3">select</a></td></tr>
-                <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 3</td><td>80</td><td><a id="select4">select</a></td></tr>
-                <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 7</td><td>83</td><td><a id="select5">select</a></td></tr>
-                <div><a>Create listing</a></div>
+                <tbody>
+                  <tr><th>Owner</th><th>Asset name</th><th>Price (USDC)</th><th></th></tr>
+                  {this.state.dexData.map((dexEntry, index) => {
+                    return <tr key={index}><td>{dexEntry.address}</td><td>{dexEntry.location}</td><td>{dexEntry.price}</td><td><a onClick={()=>this.select(index)}>select</a></td></tr>
+                  })}
+                </tbody>
               </table>
 
-              <div className="columns">
-                <div className="column">
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Price</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <div className="select is-fullwidth">
-                            <input className="input" id="priceField" disabled />
-                            <div className="icon is-small is-left">
-                              <i className="fas fa-coins"></i>
+              {this.state.selectedIndex == -1 ? "" : 
+                  <div>{this.props.accountsData == null ? 
+                    <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate</button>
+                    : <div>
+                    <div className="columns">
+                      <div className="column">
+                        <div className="field is-horizontal">
+                          <div className="field-label is-normal">
+                            <label className="label">Price</label>
+                          </div>
+                          <div className="field-body">
+                            <div className="field">
+                              <div className="control is-expanded has-icons-left">
+                                <div className="select is-fullwidth">
+                                  <input value={this.state.priceField_value} className="input" id="priceField" disabled />
+                                  <div className="icon is-small is-left">
+                                    <i className="fas fa-coins"></i>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="field is-horizontal">
+                          <div className="field-label is-normal">
+                            <label className="label">Payment Account</label>
+                          </div>
+                          <div className="field-body">
+                            <div className="field">
+                              <div className="control is-expanded has-icons-left">
+                                <div className="select is-fullwidth">
+                                  <select id="paymentAccountField">
+                                    {this.props.accountsData.map((account)=>{
+                                      return <option key={account.address} value={account.address}>{account.address}</option>
+                                    })}
+                                  </select>
+                                </div>
+                                <div className="icon is-small is-left">
+                                  <i className="fas fa-wallet"></i>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
+                    <button onClick={()=>{executePVTransaction()}} className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and list</button>
                   </div>
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Payment Account</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <div className="select is-fullwidth">
-                            <select id="paymentAccountField">
-                              <option value="-1">No accounts available</option>
-                            </select>
-                          </div>
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-wallet"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and Send</button>
-            </div>
-          </div>
-          <div className="modal" id="processingModal">
-            <div className="modal-background"></div>
-            <div className="modal-content">
-              <div className="box">
-                <span id="processingMessage">Processing, please wait...</span>
-                <progress className="progress is-small is-primary mt-1" max="100">15%</progress>
-              </div>
+                    }
+                </div>}
             </div>
           </div>
         </section>
+        {/* DEX html */}
+        <table className="blueTable" style={{borderCollapse: "collapse", width: "100%"}} border="1">
+         <tbody>
+            <tr style={{"height": "21px"}}>
+               <td style={{ width: "33.3333%", height: "21px" }}>
+                  <p><span style={{ color: "#808080" }}><strong>Execute Order</strong></span></p>
+               </td>
+               <td style={{ width: "33.3333%", height: "21px" }}><span style={{ color: "#808080" }}><strong>Current Open Orders</strong></span></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><span style={{ color: "#808080" }}><strong>Open Order</strong></span></td>
+            </tr>
+            <tr style={{height: "285px"}}>
+               <td style={{width: "33.3333%", height: "285px"}}>&nbsp;</td>
+               <td style={{width: "33.3333%", height: "285px", textAlign: "center"}}>
+                  <div>
+                     <label>N-D-Max-Min-Asset</label>
+                     <form>
+                        <select id="ta" size="20" width='250px'>
+                        </select>
+                     </form>
+                     <label id='listingaccount' className="orders">Select Order</label>
+                  </div>
+               </td>
+               <td style={{width: "33.3333%", height: "285px"}}>
+                  <div>
+                     <div><span style={{ color: "#808080" }}><strong>N units of the asset per D microAlgos</strong></span></div>
+                  </div>
+               </td>
+            </tr>
+            <tr style={{ height: "21px" }}>
+               <td style={{ width: "33.3333%", height: "21px" }}><span style={{ color: "#808080" }}><strong>Spending Asset ID: </strong></span><input id="buyer_assetid" type="number" /></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><span style={{ color: "#808080" }}><strong>Asset ID:</strong></span></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><input id="assetid" type="number" /></td>
+            </tr>
+            {/*<tr style={{ height: "21px" }}>
+               <td style={{ width: "33.3333%", height: "21px" }}><strong>Asset Amount: </strong></span><input id="buyer_assets" type="number" /></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><span style={{ color: "#808080" }}><strong>Min MicroAlgos:</strong></span></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><input id="min" type="number" /></td>
+            </tr>
+            <tr style={{ height: "21px" }}>
+               <td style={{ width: "33.3333%", height: "21px" }}><strong>Receive MicroAlgo: </strong></span><input id="buyer_algos" type="number" /></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><span style={{ color: "#808080" }}><strong>Max MicroAlgos:</strong></span></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><input id="max" type="number" /></td>
+            </tr>*/}
+            <tr style={{ height: "21px" }}>
+               <td style={{ width: "33.3333%", height: "21px" }}>&nbsp;</td>
+               <td style={{ width: "33.3333%", height: "21px" }}><span style={{ color: "#808080" }}><strong>N:</strong></span></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><input id="N" type="number" /></td>
+            </tr>
+            <tr style={{ height: "21px" }}>
+               <td style={{ width: "33.3333%", height: "21px" }}>&nbsp;</td>
+               <td style={{ width: "33.3333%", height: "21px" }}><span style={{ color: "#808080" }}><strong>D:</strong></span></td>
+               <td style={{ width: "33.3333%", height: "21px" }}><input id="D" type="number" /></td>
+            </tr>
+            <tr>
+               <td style={{ width: "33.3333%" }}><button id="eo" className="myButton" type="button">Execute Order </button><button id="ro" className="myButton" type="button">Refresh Orders </button></td>
+               <td style={{ width: "33.3333%" }}><button id="oi" className="myButton" type="button">Opt In to App </button><button id="oo" className="myButton" type="button">Opt Out of App </button></td>
+               <td style={{ width: "33.3333%" }}><button id="po" className="myButton" type="button">Place Order </button><button id="co" className="myButton" type="button">Close Order </button></td>
+            </tr>
+         </tbody>
+        </table>
+
       </div>
     );
   }
 }
 
 //////////////
-
-function fetchAccounts() {
-  showProcessingModal("Please wait...");
-
-  let paymentAccountSelect = document.getElementById('paymentAccountField');
-
-  renderLoadingSelect(paymentAccountSelect);
-
-  AlgoSigner.connect()
-    // fetch accounts
-    .then(() => AlgoSigner.accounts({
-      ledger: 'TestNet'
-    }))
-    // populate account dropdowns
-    .then((accountsData) => {
-      renderAccountSelect(paymentAccountSelect, accountsData);
-      hideProcessingModal();
-    })
-    .catch((e) => {
-      handleClientError(e.message);
-      hideProcessingModal();
-    });
-}
 
 function executePVTransaction() {
   let paymentAccount = document.getElementById('paymentAccountField').value;

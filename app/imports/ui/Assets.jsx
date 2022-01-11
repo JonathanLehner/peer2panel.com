@@ -1,43 +1,18 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
+import { NonceProvider } from 'react-select';
+import Dialogs from './Dialogs.jsx';
+
 const algosdk = require("algosdk");
 
 export default class Assets extends Component {
   state = {
     counter: 0,
-  }
-
-  increment() {
-    this.setState({
-      counter: this.state.counter + 1
-    });
+    selectedReceiver: null,
+    priceField_value: 0,
+    receiverField_value: 0
   }
 
   componentDidMount(){
-    let select1 = document.getElementById("select1")
-    let select2 = document.getElementById("select2")
-    let select3 = document.getElementById("select3")
-    let priceField = document.getElementById("priceField")
-    let receiverField = document.getElementById("receiverAField")
-
-    select1.addEventListener("click", function () {
-      priceField.value = 500*1000;
-      updateMicroAlgoConverter(500*1000);
-      receiverField.value = "PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4"
-    });
-    select2.addEventListener("click", function () {
-      priceField.value = 1100*1000;
-      updateMicroAlgoConverter(1100*1000);
-      receiverField.value = "PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4"
-    });
-    select3.addEventListener("click", function () {
-      priceField.value = 1400*1000;      
-      updateMicroAlgoConverter(1400*1000);
-      receiverField.value = "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU"
-    });
-
-    document.getElementById('btnRefreshAccounts').addEventListener('click', fetchAccounts);
-    document.getElementById('btnSignAndSend').addEventListener('click', executeSplitTransaction);
-
     var closeButtonElements = document.getElementsByClassName('delete');
   
     for (var i = 0; i < closeButtonElements.length; i++) {
@@ -48,175 +23,67 @@ export default class Assets extends Component {
     
   }
 
+  select1() {
+    this.setState({selectedReceiver: 0, priceField_value: 500*100, receiverField_value: "PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4"});
+  }
+
+  select2() {
+    this.setState({selectedReceiver: 1, priceField_value: 1100*1000, receiverField_value: "PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4"});
+  }
+
+  select3() {
+    this.setState({selectedReceiver: 2, priceField_value: 1400*1000, receiverField_value: "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU"});
+  }
+
   render() {
     return (
       <div>
         <section className="section">
           <div className="container">
-            <article id="successDialog" className="message is-success is-hidden">
-              <div className="message-header">
-                <p>Success</p>
-                <button className="delete" aria-label="delete"></button>
-              </div>
-              <div className="message-body">
-                <span id="successMessage"></span>
-              </div>
-            </article>
-            <article id="errorDialog" className="message is-danger is-hidden">
-              <div className="message-header">
-                <p>Error</p>
-                <button className="delete" aria-label="delete"></button>
-              </div>
-              <div className="message-body">
-                An error occurred: <span id="errorMessage"></span>
-              </div>
-            </article>
-
+            <Dialogs />
             <div id="divDemoBlock" className="">
               <h1 className="title">Asset management</h1>
 
               <p className="subtitle">
-                Pay or receive rent for your asset-backed PV tokens. The rent includes a maintenance fee which is automatically sent to Peer2Panel by the smart contract.
+                Pay or receive rent for your asset-backed PV tokens. The rent includes a 15% maintenance fee which is automatically sent to Peer2Panel by the smart contract.
               </p>
 
+              <h5>My PV installations - pay rent</h5>
 
-              <table>
-                <tr><th>Owner</th><th>Expiry</th><th>Asset name</th><th>Supplied electricity</th><th>Price per kWh</th><th>Total price</th><th></th></tr>
-                <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>09/2022</td><td>PV Zurich 1</td><td>5000</td><td>0.1 mili-ALGO</td><td>0.5 ALGO</td><td><a id="select1">pay now</a></td></tr>
-                <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>09/2022</td><td>PV Zurich 7</td><td>5500</td><td>0.2 mili-ALGO</td><td>1.1 ALGO</td><td><a id="select2">pay now</a></td></tr>
-                <tr><td>MXGQURRN2EDHAEXDXEE4...</td><td>08/2022</td><td>PV Zurich 5</td><td>7000</td><td>0.2 mili-ALGO</td><td>1.4 ALGO</td><td><a id="select3">pay now</a></td></tr>
-              </table>
+              {this.props.accountsData == null ? 
+                <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate</button>
+                : <div>
+                    <table>
+                      <tbody>
+                        <tr><th>Owner</th><th>Asset name</th><th>Supplied electricity in kWh</th><th>Monthly rent</th><th></th></tr>
+                        <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 1</td><td>5000</td><td>100 USDC</td><td><a onClick={()=>this.select1()}>pay now</a></td></tr>
+                        <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 7</td><td>5500</td><td>50 USDC</td><td><a onClick={()=>this.select1()}>pay now</a></td></tr>
+                        <tr><td>MXGQURRN2EDHAEXDXEE4...</td><td>PV Zurich 5</td><td>7000</td><td>70 USDC</td><td><a onClick={()=>this.select1()}>pay now</a></td></tr>
+                      </tbody>
+                    </table>
+                    {this.state.selectedReceiver != null ? <PaymentForm {...this.state} {...this.props}/> : ""}
+                  </div>
+                }
 
-              <div className="columns">
-                <div className="column">
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Sender</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <div className="select is-fullwidth">
-                            <select id="paymentAccountField">
-                              <option value="-1">No accounts available</option>
-                            </select>
-                          </div>
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-wallet"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              <br/>
+              <br/>
+              <h5>My PV tokens - collect rent</h5>
+              <p>The rent is automatically sent to your wallet every month.</p>
+
+              {this.props.accountsData == null ? 
+                <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate</button>
+                : <div>
+                    <table>
+                      <tbody>
+                        <tr><th>Account</th><th>Asset name</th><th>Monthly rent</th><th></th></tr>
+                        <tr><td>{this.props.accountsData[0].address.substr(0,12)}...</td><td>PV Zurich 1</td><td>100 USDC</td><td></td></tr>
+                        <tr><td>{this.props.accountsData[0].address.substr(0,12)}...</td><td>PV Zurich 7</td><td>50 USDC</td><td></td></tr>
+                        <tr><td>{this.props.accountsData[1].address.substr(0,12)}...</td><td>PV Zurich 5</td><td>70 USDC</td><td></td></tr>
+                      </tbody>
+                    </table>
                   </div>
-                </div>
-              </div>
-              <div className="columns">
-                <div className="column is-10">
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">PV NFT owner</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <div className="select is-fullwidth">
-                            <select id="receiverAField" disabled>
-                              <option value="-1">Select PPA above</option>
-                              <option value="PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4">PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4</option>
-                              <option value="MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU">MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU</option>    
-                            </select>
-                          </div>
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-wallet"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="column is-2">
-                  <div className="field is-horizontal">
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <input id="percentOfPaymentAField" className="input" type="number" value="90" onchange="balancePercentageFields(this.id);" disabled />
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-percent"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="columns">
-                <div className="column is-10">
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">SolarCoin <i>maintenance</i></label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <div className="select is-fullwidth">
-                            <select id="receiverBField" disabled>
-                              <option value="PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4">PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4</option>
-                            </select>
-                          </div>
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-wallet"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="column is-2">
-                  <div className="field is-horizontal">
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <input id="percentOfPaymentBField" className="input" type="number" value="10" disabled
-                            onchange="balancePercentageFields(this.id);" />
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-percent"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="field is-horizontal">
-                <div className="field-label is-normal">
-                  <label className="label">Total price</label>
-                </div>
-                <div className="field-body">
-                  <div className="field has-addons">
-                    <div className="control is-expanded has-icons-left">
-                      <input className="input" id="priceField" placeholder="µAlgos" onchange="updateMicroAlgoConverter(this.value);" disabled />
-                      <div className="icon is-small is-left">
-                        <i className="fas fa-coins"></i>
-                      </div>
-                    </div>
-                    <p className="control">
-                      <a className="button is-static" id="microToAlgo">
-                        0 Algos
-                      </a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <button className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and Send</button>
-            </div>
-          </div>
-          <div className="modal" id="processingModal">
-            <div className="modal-background"></div>
-            <div className="modal-content">
-              <div className="box">
-                <span id="processingMessage">Processing, please wait...</span>
-                <progress className="progress is-small is-primary mt-1" max="100">15%</progress>
-              </div>
+                }
+
             </div>
           </div>
         </section>
@@ -225,30 +92,7 @@ export default class Assets extends Component {
   }
 }
 
-//////////////
-
-function fetchAccounts() {
-  showProcessingModal("Please wait...");
-
-  let paymentAccountSelect = document.getElementById('paymentAccountField');
-
-  renderLoadingSelect(paymentAccountSelect);
-
-  AlgoSigner.connect()
-    // fetch accounts
-    .then(() => AlgoSigner.accounts({
-      ledger: 'TestNet'
-    }))
-    // populate account dropdowns
-    .then((accountsData) => {
-      renderAccountSelect(paymentAccountSelect, accountsData);
-      hideProcessingModal();
-    })
-    .catch((e) => {
-      handleClientError(e.message);
-      hideProcessingModal();
-    });
-}    
+//////////////   
 
 function executeSplitTransaction() {
   let sender = document.getElementById('paymentAccountField').value;
@@ -370,4 +214,131 @@ function balancePercentageFields(sender) {
     percentBElement.value = Math.max(Math.min(percentBElement.value, 100), 0);
     percentAElement.value = 100 - percentBElement.value;
   }
+}
+
+function PaymentForm(props) {
+  return (
+    <div>
+              <div className="columns">
+                <div className="column">
+                  <div className="field is-horizontal">
+                    <div className="field-label is-normal">
+                      <label className="label">Sender</label>
+                    </div>
+                    <div className="field-body">
+                      <div className="field">
+                        <div className="control is-expanded has-icons-left">
+                          <div className="select is-fullwidth">
+                            <select id="paymentAccountField">
+                              {props.accountsData && props.accountsData.map((account)=>{
+                                return <option key={account.address} value={account.address}>{account.address}</option>
+                              })}
+                            </select>
+                          </div>
+                          <div className="icon is-small is-left">
+                            <i className="fas fa-wallet"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="columns">
+                <div className="column is-10">
+                  <div className="field is-horizontal">
+                    <div className="field-label is-normal">
+                      <label className="label">PV NFT owner</label>
+                    </div>
+                    <div className="field-body">
+                      <div className="field">
+                        <div className="control is-expanded has-icons-left">
+                          <div className="select is-fullwidth">
+                            <select id="receiverAField" value={props.receiverField_value} disabled>
+                              <option value="-1">Select contract above</option>
+                              <option value="PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4">PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4</option>
+                              <option value="MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU">MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU</option>    
+                            </select>
+                          </div>
+                          <div className="icon is-small is-left">
+                            <i className="fas fa-wallet"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="column is-2">
+                  <div className="field is-horizontal">
+                    <div className="field-body">
+                      <div className="field">
+                        <div className="control is-expanded has-icons-left">
+                          <input id="percentOfPaymentAField" className="input" type="number" value="85" onChange={()=>balancePercentageFields(this.id)} disabled />
+                          <div className="icon is-small is-left">
+                            <i className="fas fa-percent"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="columns">
+                <div className="column is-10">
+                  <div className="field is-horizontal">
+                    <div className="field-label is-normal">
+                      <label className="label">SolarCoin <i>maintenance</i></label>
+                    </div>
+                    <div className="field-body">
+                      <div className="field">
+                        <div className="control is-expanded has-icons-left">
+                          <div className="select is-fullwidth">
+                            <select id="receiverBField" disabled>
+                              <option value="PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4">PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4</option>
+                            </select>
+                          </div>
+                          <div className="icon is-small is-left">
+                            <i className="fas fa-wallet"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="column is-2">
+                  <div className="field is-horizontal">
+                    <div className="field-body">
+                      <div className="field">
+                        <div className="control is-expanded has-icons-left">
+                          <input id="percentOfPaymentBField" className="input" type="number" value="15" disabled
+                            onChange={()=>balancePercentageFields(this.id)} />
+                          <div className="icon is-small is-left">
+                            <i className="fas fa-percent"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="field is-horizontal">
+                <div className="field-label is-normal">
+                  <label className="label">Price</label>
+                </div>
+                <div className="field-body">
+                  <div className="field has-addons">
+                    <div className="control is-expanded has-icons-left">
+                      <input value={props.priceField_value} className="input" id="priceField" placeholder="µAlgos" onChange={()=>updateMicroAlgoConverter(this.value)} disabled />
+                      <div className="icon is-small is-left">
+                        <i className="fas fa-coins"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button onClick={()=>executeSplitTransaction()} className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and send payment</button>
+    </div>
+  )
+
+
 }

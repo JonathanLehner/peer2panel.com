@@ -2,13 +2,9 @@ function checkForAlgosigner() {
   if (typeof AlgoSigner !== 'undefined') {
     console.log(`AlgoSigner check passed.`);
     document.getElementById('divAlgoSignerCheck').classList.add("is-hidden");
-    document.getElementById('divDemoBlock').classList.remove("is-hidden");
-    document.getElementById('btnRefreshAccounts').classList.remove("is-hidden");
   } else {
     console.log(`Couldn't find AlgoSigner!`);
     document.getElementById('divAlgoSignerCheck').classList.remove("is-hidden");
-    document.getElementById('divDemoBlock').classList.add("is-hidden");
-    document.getElementById('btnRefreshAccounts').classList.add("is-hidden");
   };
 }
 
