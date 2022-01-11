@@ -53,7 +53,7 @@ export default class Trade extends Component {
               <h1 className="title">PV token marketplace</h1>
 
               <p className="subtitle">
-                Pay USDC to another investor, to get Photolvoltaic (PV) NFTs. Or sell your own PV tokens.
+                Pay USDC to another investor, to get Photovoltaic (PV) NFTs. Or sell your own PV tokens.
               </p>
               <table>
                 <tbody>

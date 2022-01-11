@@ -7,19 +7,6 @@ export default class Mint extends Component {
     counter: 0,
   }
 
-  componentDidMount(){
-    document.getElementById('btnSignAndSend').addEventListener('click', signAndSendTransaction);
-
-    var closeButtonElements = document.getElementsByClassName('delete');
-  
-    for (var i = 0; i < closeButtonElements.length; i++) {
-      closeButtonElements[i].addEventListener('click', (e) => {
-        e.target.parentElement.parentElement.classList.add('is-hidden');
-      });
-    }
-    
-  }
-
   render() {
     return (
       <div>
@@ -33,105 +20,113 @@ export default class Mint extends Component {
               <p className="subtitle">
                 Mint an NFT for a PV installation. <i>admin only</i>
               </p>
-              <div className="columns">
-                <div className="column">
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Admin wallet address</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <div className="select is-fullwidth">
-                            <select id="paymentAccountField">
-                              <option value="-1">No accounts available</option>
-                            </select>
+              {this.props.accountsData == null ? 
+                <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate</button>
+                    : 
+                  <div>
+                  <div className="columns">
+                    <div className="column">
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Admin wallet address</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                              <div className="select is-fullwidth">
+                                <select id="paymentAccountField">
+                                  {this.props.accountsData.map((account)=>{
+                                    return <option key={account.address} value={account.address}>{account.address}</option>
+                                  })}
+                                </select>
+                              </div>
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-wallet"></i>
+                              </div>
+                            </div>
                           </div>
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-wallet"></i>
+                        </div>
+                      </div>
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Name of PV installation</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                              <input className="input" id="assetNameField" />
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-signature"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Asset Unit Name</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                              <input className="input" id="assetUnitField" value="PV" disabled />
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-signature"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Total Units</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                              <input className="input" id="assetTotalUnitsField" />
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-coins"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Decimals</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                              <input className="input" id="assetNumberOfDecimalsField" value={0} disabled />
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-coins"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Note</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                              <input className="input" id="noteField" placeholder="(optional)" />
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-sticky-note"></i>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Name of PV installation</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <input className="input" id="assetNameField" />
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-signature"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <button onClick={()=>signAndSendTransaction()}className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and mint</button>
                   </div>
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Asset Unit Name</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <input className="input" id="assetUnitField" value="PV" disabled />
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-signature"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Total Units</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <input className="input" id="assetTotalUnitsField" />
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-coins"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Decimals</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <input className="input" id="assetNumberOfDecimalsField" value={0} disabled />
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-coins"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="field is-horizontal">
-                    <div className="field-label is-normal">
-                      <label className="label">Note</label>
-                    </div>
-                    <div className="field-body">
-                      <div className="field">
-                        <div className="control is-expanded has-icons-left">
-                          <input className="input" id="noteField" placeholder="(optional)" />
-                          <div className="icon is-small is-left">
-                            <i className="fas fa-sticky-note"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button className="button is-dark is-fullwidth" id="btnSignAndSend">Sign and mint</button>
+              }
 
              
             </div>
@@ -160,26 +155,35 @@ function signAndSendTransaction() {
       ledger: 'TestNet',
       path: '/v2/transactions/params'
     }))
-    // sign new transaction
-    .then((txParams) => AlgoSigner.sign({
-      from: from,
-      assetName: assetName,
-      assetUnitName: assetUnit,
-      assetTotal: +assetTotal,
-      assetDecimals: +assetDecimals,
-      note: assetNote,
-      type: 'acfg', // ASA Configuration (acfg)
-      fee: txParams['min-fee'],
-      firstRound: txParams['last-round'],
-      lastRound: txParams['last-round'] + 1000,
-      genesisID: txParams['genesis-id'],
-      genesisHash: txParams['genesis-hash'],
-      flatFee: true
-    }))
+    .then((txParams) => {
+      let sdkTx = new algosdk.Transaction({
+        from: from,
+        assetName: assetName,
+        assetUnitName: assetUnit,
+        assetTotal: +assetTotal,
+        assetDecimals: +assetDecimals,
+        note: assetNote,
+        type: 'acfg', // ASA Configuration (acfg)
+        fee: txParams['min-fee'],
+        firstRound: txParams['last-round'],
+        lastRound: txParams['last-round'] + 1000,
+        genesisID: txParams['genesis-id'],
+        genesisHash: txParams['genesis-hash'],
+        flatFee: true
+      });
+      let binaryTx = sdkTx.toByte();
+      let base64Tx = AlgoSigner.encoding.msgpackToBase64(binaryTx);
+      let signedTxs = AlgoSigner.signTxn([ // returns a promise
+        {
+          txn: base64Tx,
+        },
+      ]);
+      return signedTxs;
+    })
     // send signed transaction
     .then((signedTx) => AlgoSigner.send({
       ledger: 'TestNet',
-      tx: signedTx.blob
+      tx: signedTx[0].blob
     }))
     // wait for confirmation from the blockchain
     .then((tx) => waitForAlgosignerConfirmation(tx)) // see algosignerutils.js
