@@ -18,7 +18,7 @@ export default class Mint extends Component {
               <h1 className="title">NFT minting</h1>
 
               <p className="subtitle">
-                Mint an NFT for a PV installation. <i>admin only</i>
+                Mint an NFT for a PV installation. <i>admin only on mainnet</i>
               </p>
               {this.props.accountsData == null ? 
                 <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate</button>
