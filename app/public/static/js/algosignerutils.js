@@ -19,6 +19,7 @@ async function waitForAlgosignerConfirmation(tx) {
     if(status['confirmed-round'] !== null && status['confirmed-round'] > 0) {
       //Got the completed Transaction
       console.log(`Transaction confirmed in round ${status['confirmed-round']}.`);
+      console.log(status);
       break;
     }
 
@@ -28,5 +29,5 @@ async function waitForAlgosignerConfirmation(tx) {
     });
   }
   
-  return tx;
+  return {txId: tx.txId, assetID: status['asset-index']};
 }

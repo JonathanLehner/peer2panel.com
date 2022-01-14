@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 const algosdk = require("algosdk");
 import Dialogs from './Dialogs.jsx';
+import axios from 'axios';
 
 export default class Mint extends Component {
   state = {
@@ -54,7 +55,24 @@ export default class Mint extends Component {
                         <div className="field-body">
                           <div className="field">
                             <div className="control is-expanded has-icons-left">
-                              <input className="input" id="assetNameField" />
+                              <input defaultValue="Zurich PV Caesar-Ritz-Strasse 5" className="input" id="assetNameField" />
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-signature"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Image of installation (stored on IPFS!)</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                            <form method="post" encType="multipart/form-data" action="/asset_upload">
+                                <input className="input" type="file" name="file" id="imageUpload"/>
+                            </form>
                               <div className="icon is-small is-left">
                                 <i className="fas fa-signature"></i>
                               </div>
@@ -84,7 +102,7 @@ export default class Mint extends Component {
                         <div className="field-body">
                           <div className="field">
                             <div className="control is-expanded has-icons-left">
-                              <input className="input" id="assetTotalUnitsField" />
+                              <input defaultValue={10} className="input" id="assetTotalUnitsField" />
                               <div className="icon is-small is-left">
                                 <i className="fas fa-coins"></i>
                               </div>
@@ -139,8 +157,28 @@ export default class Mint extends Component {
 
 //////////////
 
-function signAndSendTransaction() {
+async function signAndSendTransaction() {
   showProcessingModal("Sending transaction...");
+
+  var bodyFormData = new FormData();
+  bodyFormData.append('file', document.getElementById("imageUpload").files[0]);
+
+  const asset = await axios({
+    method: "post",
+    url: "/asset_upload",
+    data: bodyFormData,
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+    .then(function (asset) {
+      return asset;
+    })
+    .catch(function (response) {
+      console.log(response);
+    });
+  console.log(asset);
+  const url = asset.data.url;
+  const metadata = asset.data.metadata;
+  const metadataUint8Array = new Uint8Array(metadata);
 
   let from = document.getElementById('paymentAccountField').value;
   let assetName = document.getElementById('assetNameField').value;
@@ -163,13 +201,19 @@ function signAndSendTransaction() {
         assetTotal: +assetTotal,
         assetDecimals: +assetDecimals,
         note: algosdk.encodeObj(assetNote),
+        assetURL: url,// "https://demo.peer2panel.com/assets/1",
+        assetMetadataHash: metadataUint8Array,
         type: 'acfg', // ASA Configuration (acfg)
         fee: txParams['min-fee'],
         firstRound: txParams['last-round'],
         lastRound: txParams['last-round'] + 1000,
         genesisID: txParams['genesis-id'],
         genesisHash: txParams['genesis-hash'],
-        flatFee: true
+        flatFee: true,
+        assetManager: "D3MSQ7UFLE7UEGHGMUZZW7OKPGX4HTOVCJY6FF3IJLYUZOLAYEES2N4JWU",
+        assetReserve: "D3MSQ7UFLE7UEGHGMUZZW7OKPGX4HTOVCJY6FF3IJLYUZOLAYEES2N4JWU",
+        assetFreeze: "D3MSQ7UFLE7UEGHGMUZZW7OKPGX4HTOVCJY6FF3IJLYUZOLAYEES2N4JWU",
+        assetClawback: "D3MSQ7UFLE7UEGHGMUZZW7OKPGX4HTOVCJY6FF3IJLYUZOLAYEES2N4JWU"
       });
       let binaryTx = sdkTx.toByte();
       let base64Tx = AlgoSigner.encoding.msgpackToBase64(binaryTx);
@@ -189,9 +233,10 @@ function signAndSendTransaction() {
     .then((tx) => waitForAlgosignerConfirmation(tx)) // see algosignerutils.js
     .then((tx) => {
       // was successful
+      console.log(tx);
       document.getElementById('successMessage').innerHTML = "An asset named &quot;" + assetName +
         "&quot; was created. <a target=&quot;_blank&quot; href='https://testnet.algoexplorer.io/tx/" + tx.txId +
-        "'>View on AlgoExplorer</a>"
+        "'>View on AlgoExplorer</a> "+"or <a target=&quot;_blank&quot; href='https://peer2panel.com/assets/"+tx.assetID+"'>View on Peer2Panel</a>";
       document.getElementById('errorDialog').classList.add("is-hidden");
       document.getElementById('successDialog').classList.remove("is-hidden");
       hideProcessingModal();
