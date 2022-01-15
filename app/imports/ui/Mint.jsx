@@ -35,7 +35,7 @@ export default class Mint extends Component {
                           <div className="field">
                             <div className="control is-expanded has-icons-left">
                               <div className="select is-fullwidth">
-                                <select id="paymentAccountField">
+                                <select id="paymentAccountField" defaultValue={this.props.accountsData[0].address}>
                                   {this.props.accountsData.map((account)=>{
                                     return <option key={account.address} value={account.address}>{account.address}</option>
                                   })}
@@ -65,7 +65,7 @@ export default class Mint extends Component {
                       </div>
                       <div className="field is-horizontal">
                         <div className="field-label is-normal">
-                          <label className="label">Image of installation (stored on IPFS!)</label>
+                          <label className="label">Image of installation (stored on IPFS with Pinata!)</label>
                         </div>
                         <div className="field-body">
                           <div className="field">
@@ -158,7 +158,7 @@ export default class Mint extends Component {
 //////////////
 
 async function signAndSendTransaction() {
-  showProcessingModal("Sending transaction...");
+  showProcessingModal("Uploading image to IPFS...");
 
   var bodyFormData = new FormData();
   bodyFormData.append('file', document.getElementById("imageUpload").files[0]);
@@ -186,6 +186,8 @@ async function signAndSendTransaction() {
   let assetTotal = document.getElementById('assetTotalUnitsField').value;
   let assetDecimals = document.getElementById('assetNumberOfDecimalsField').value;
   let assetNote = document.getElementById('noteField').value;
+
+  showProcessingModal("Sending transaction...");
 
   AlgoSigner.connect()
     // fetch current parameters
@@ -236,7 +238,7 @@ async function signAndSendTransaction() {
       console.log(tx);
       document.getElementById('successMessage').innerHTML = "An asset named &quot;" + assetName +
         "&quot; was created. <a target=&quot;_blank&quot; href='https://testnet.algoexplorer.io/tx/" + tx.txId +
-        "'>View on AlgoExplorer</a> "+"or <a target=&quot;_blank&quot; href='https://peer2panel.com/assets/"+tx.assetID+"'>View on Peer2Panel</a>";
+        "'>View on AlgoExplorer</a> "+"or <a target=&quot;_blank&quot; href='https://peer2panel.com/assets/"+tx.assetID+"'>view on Peer2Panel</a>.";
       document.getElementById('errorDialog').classList.add("is-hidden");
       document.getElementById('successDialog').classList.remove("is-hidden");
       hideProcessingModal();

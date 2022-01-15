@@ -23,19 +23,19 @@ export default class Assets extends Component {
     
   }
 
-  select1() {
-    this.setState({selectedReceiver: 0, priceField_value: 500*100, receiverField_value: "PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4"});
-  }
-
-  select2() {
-    this.setState({selectedReceiver: 1, priceField_value: 1100*1000, receiverField_value: "PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4"});
-  }
-
-  select3() {
-    this.setState({selectedReceiver: 2, priceField_value: 1400*1000, receiverField_value: "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU"});
+  select(index) {
+    const contracts = this.props.contracts;
+    const selected_contract = contracts[index];
+    console.log(selected_contract);
+    this.setState({selectedReceiver: 0, priceField_value: selected_contract.rent*100, receiverField_value: selected_contract.current_owner});
   }
 
   render() {
+    const accountsData = this.props.accountsData;
+    const assets = this.props.assets;
+    const contracts = this.props.contracts;
+    console.log(assets);
+    const solar_assets = assets && this.props.assets.filter((asset) => asset.amount <= 10 && asset.amount > 0 && asset.params['unit-name'] == "PV" && asset.creator == "D3MSQ7UFLE7UEGHGMUZZW7OKPGX4HTOVCJY6FF3IJLYUZOLAYEES2N4JWU");
     return (
       <div>
         <section className="section">
@@ -47,18 +47,19 @@ export default class Assets extends Component {
               <p className="subtitle">
                 Pay or receive rent for your asset-backed PV tokens. The rent includes a 15% maintenance fee which is automatically sent to Peer2Panel by the smart contract.
               </p>
+              <p>PV tokens are only valid created by Peer2Panel admin address "D3MSQ7UFLE7UEGHGMUZZW7OKPGX4HTOVCJY6FF3IJLYUZOLAYEES2N4JWU".</p>
 
               <h5>My PV installations - pay rent</h5>
-
-              {this.props.accountsData == null ? 
+              <p>Some exchanges like Binance do not support USDC on Algorand yet. We recommend <a href="https://www.huobi.com/" target="_blank">Huobi</a>.</p>
+              {accountsData == null ? 
                 <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate</button>
                 : <div>
                     <table>
                       <tbody>
-                        <tr><th>Owner</th><th>Asset name</th><th>Supplied electricity in kWh</th><th>Monthly rent</th><th></th></tr>
-                        <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 1</td><td>5000</td><td>100 USDC</td><td><a onClick={()=>this.select1()}>pay now</a></td></tr>
-                        <tr><td>PGPN6HSIXJT73IHLCSAH...</td><td>PV Zurich 7</td><td>5500</td><td>50 USDC</td><td><a onClick={()=>this.select1()}>pay now</a></td></tr>
-                        <tr><td>MXGQURRN2EDHAEXDXEE4...</td><td>PV Zurich 5</td><td>7000</td><td>70 USDC</td><td><a onClick={()=>this.select1()}>pay now</a></td></tr>
+                        <tr><th>Current owner</th><th>Asset name</th><th>Asset ID</th><th>Monthly rent</th><th></th></tr>
+                        {contracts && contracts.map((asset, index)=>{
+                          return (<tr key={asset.assetID}><td>{asset.current_owner.substr(0,12)}...</td><td>{asset.assetName}</td><td><a target="_blank" href={`/assets/${asset.assetID}`}>{asset.assetID}</a></td><td>{asset.rent} USDC</td><td><a href="#" onClick={()=>this.select(index)}>pay now</a></td></tr>)
+                        })}  
                       </tbody>
                     </table>
                     {this.state.selectedReceiver != null ? <PaymentForm {...this.state} {...this.props}/> : ""}
@@ -75,10 +76,10 @@ export default class Assets extends Component {
                 : <div>
                     <table>
                       <tbody>
-                        <tr><th>Account</th><th>Asset name</th><th>Monthly rent</th><th></th></tr>
-                        <tr><td>{this.props.accountsData[0].address.substr(0,12)}...</td><td>PV Zurich 1</td><td>100 USDC</td><td></td></tr>
-                        <tr><td>{this.props.accountsData[0].address.substr(0,12)}...</td><td>PV Zurich 7</td><td>50 USDC</td><td></td></tr>
-                        <tr><td>{this.props.accountsData[1].address.substr(0,12)}...</td><td>PV Zurich 5</td><td>70 USDC</td><td></td></tr>
+                        <tr><th>Account</th><th>Asset name</th><th>Asset ID</th><th>Monthly rent</th><th></th></tr>
+                        {solar_assets && solar_assets.map((asset)=>{
+                          return (<tr key={asset['asset-id']}><td>{this.props.accountsData[0].address.substr(0,12)}...</td><td>{asset.params['name']}</td><td><a target="_blank" href={`/assets/${asset['asset-id']}`}>{asset['asset-id']}</a></td><td>{asset.rent} USDC</td></tr>)
+                        })}                     
                       </tbody>
                     </table>
                   </div>
@@ -95,6 +96,7 @@ export default class Assets extends Component {
 //////////////   
 
 function executeSplitTransaction() {
+  console.log("execute split transaction")
   let sender = document.getElementById('paymentAccountField').value;
   let recipient1 = document.getElementById('receiverAField').value;
   let recipient2 = document.getElementById('receiverBField').value;
@@ -103,9 +105,8 @@ function executeSplitTransaction() {
   let amount = document.getElementById('priceField').value;
   let contractAddress = null;
 
-  if(amount * ratio1 / 100 < 3000 || amount * ratio2 / 100 < 3000) {
-    document.getElementById('errorMessage').innerHTML = 
-    "The amount each recipient is paid must be at least 3000 µAlgos."
+  if(amount * ratio1 / 100 < 300 || amount * ratio2 / 100 < 300) {
+    alert("The amount each recipient is paid must be at least 3000 µAlgos.");
     document.getElementById('successDialog').classList.add("is-hidden");
     document.getElementById('errorDialog').classList.remove("is-hidden");
 
@@ -229,7 +230,7 @@ function PaymentForm(props) {
                       <div className="field">
                         <div className="control is-expanded has-icons-left">
                           <div className="select is-fullwidth">
-                            <select id="paymentAccountField">
+                            <select id="paymentAccountField" defaultValue={props.accountsData && props.accountsData[0].address}>
                               {props.accountsData && props.accountsData.map((account)=>{
                                 return <option key={account.address} value={account.address}>{account.address}</option>
                               })}
@@ -248,7 +249,7 @@ function PaymentForm(props) {
                 <div className="column is-10">
                   <div className="field is-horizontal">
                     <div className="field-label is-normal">
-                      <label className="label">PV NFT owner</label>
+                      <label className="label">PV token owner</label>
                     </div>
                     <div className="field-body">
                       <div className="field">
@@ -287,14 +288,14 @@ function PaymentForm(props) {
                 <div className="column is-10">
                   <div className="field is-horizontal">
                     <div className="field-label is-normal">
-                      <label className="label">SolarCoin <i>maintenance</i></label>
+                      <label className="label">Peer2Panel <i>maintenance</i></label>
                     </div>
                     <div className="field-body">
                       <div className="field">
                         <div className="control is-expanded has-icons-left">
                           <div className="select is-fullwidth">
                             <select id="receiverBField" disabled>
-                              <option value="PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4">PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4</option>
+                              <option value="COZHHPZERONOMKA6QUKUPQZIELAGTFITN24XVJ5WA3GINGCXNO7UTF5NUM">COZHHPZERONOMKA6QUKUPQZIELAGTFITN24XVJ5WA3GINGCXNO7UTF5NUM</option>
                             </select>
                           </div>
                           <div className="icon is-small is-left">

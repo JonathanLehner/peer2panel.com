@@ -19,7 +19,7 @@ const T = i18n.createComponent();
 class App extends Component  {
   constructor(props) {
     super(props);
-    this.state = { accountsData: null }       
+    this.state = { accountsData: null, assets: null }       
   }
 
   componentDidMount(){
@@ -41,8 +41,52 @@ class App extends Component  {
           .then((accountsData) => {
             this.setState({accountsData})
             hideProcessingModal();
+            return accountsData;
+          })
+          .then((accountsData) => {
+            // for demo we always take the first account in the wallet
+            // it is easy to add a dropdown to select
+            const address = accountsData[0].address;
+            return AlgoSigner.algod({
+              ledger: 'TestNet',
+              path: `/v2/accounts/${address}`
+            });
+          })
+          .then(async (accountsData) => {
+            // for demo we always take the first account in the wallet
+            // it is easy to add a dropdown to select
+            console.log(accountsData)
+            const assets = accountsData.assets;
+            console.log(assets);
+            for(var i=0; i<assets.length; i++){
+              const assetInfo = await AlgoSigner.algod({
+                ledger: 'TestNet',
+                path: `/v2/assets/${assets[i]['asset-id']}`
+              });
+              console.log(assetInfo);
+              const pvasset = PVAssets.findOne({assetID: assets[i]['asset-id']}) || {rent: 100};
+              console.log(pvasset);
+              const rent = pvasset.rent;
+              accountsData.assets[i] = {...accountsData.assets[i], ...assetInfo, rent};  
+            };
+            return accountsData;
+          })
+          .then((accountsData) => {
+            console.log(accountsData);
+            let contracts = PVContracts.find({customer: accountsData.address}).fetch();
+            if(contracts.length == 0){
+              // for demo we use fake data
+              contracts = [
+                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 57939801, rent: 800},
+                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 58331139, rent: 1000},
+                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 58547046, rent: 700},
+              ]
+            }
+            const assets = accountsData.assets;
+            this.setState({assets, contracts})
           })
           .catch((e) => {
+            console.log(e);
             handleClientError(e.message);
             hideProcessingModal();
           });

@@ -53,7 +53,7 @@ app.post(
     // uploads/Screenshot 2022-01-14 at 06.05.40.png
     // relative to .meteor/local/build/programs/server
 
-    if (path.extname(req.file.originalname).toLowerCase() === ".png" ||  path.extname(req.file.originalname).toLowerCase() === ".jpg") {
+    if (path.extname(req.file.originalname).toLowerCase() === ".png" ||  path.extname(req.file.originalname).toLowerCase() === ".jpg" ||  path.extname(req.file.originalname).toLowerCase() === ".jpeg") {
      
       const asset = await pinata.testAuthentication().then((res) => {
         console.log('Algorand NFT::ARC3::IPFS scenario 1 test connection to Pinata: ', res);

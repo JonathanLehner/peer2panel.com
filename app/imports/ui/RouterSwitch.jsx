@@ -12,6 +12,7 @@
   import Mint from './Mint.jsx';
   import Rent from './Rent.jsx';
   import Assets from './Assets.jsx';
+  import Asset from './Asset.jsx';
 
   function RouteSwitch(props) {
       return (
@@ -25,6 +26,8 @@
               <Route exact path="/about">
                 <About {...props} />
               </Route>
+              <Route path="/assets/:assetID/"
+              children={({ match }) => (<Asset {...props} match />)} />
               <Route exact path="/trade">
                 <Trade {...props} />
               </Route>
