@@ -103,7 +103,7 @@ export default class Trade extends Component {
                             <div className="field">
                               <div className="control is-expanded has-icons-left">
                                 <div className="select is-fullwidth">
-                                  <select id="paymentAccountField">
+                                  <select id="paymentAccountField" defaultValue={this.props.accountsData && this.props.accountsData[0].address}>
                                     {this.props.accountsData.map((account)=>{
                                       return <option key={account.address} value={account.address}>{account.address}</option>
                                     })}
