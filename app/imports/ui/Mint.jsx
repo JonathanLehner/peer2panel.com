@@ -268,13 +268,13 @@ async function signAndSendTransaction() {
       console.log(tx);
       document.getElementById('successMessage').innerHTML = "An asset named &quot;" + assetName +
         "&quot; was created. <a target=&quot;_blank&quot; href='https://testnet.algoexplorer.io/tx/" + tx.txId +
-        "'>View on AlgoExplorer</a> "+"or <a target=&quot;_blank&quot; href='https://peer2panel.com/assets/"+tx.assetID+"'>view on Peer2Panel</a>.";
+        "'>View on AlgoExplorer</a> "+"or <a target=&quot;_blank&quot; href='https://demo.peer2panel.com/assets/"+tx.assetID+"'>view on Peer2Panel</a>.";
       document.getElementById('errorDialog').classList.add("is-hidden");
       document.getElementById('successDialog').classList.remove("is-hidden");
 
       const rent = document.getElementById('rent').value;
       const customer = document.getElementById('customer').value;
-      PVContracts.insert({"current_owner": from, assetName, assetID: tx.assetID, rent, customer});
+      PVContracts.insert({"current_owner": from, assetName, assetID: parseInt(tx.assetID), rent, customer});
       hideProcessingModal();
     })
     .catch((e) => {

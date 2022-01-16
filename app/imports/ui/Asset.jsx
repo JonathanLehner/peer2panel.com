@@ -1,10 +1,11 @@
 import React, { Component, useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import axios from 'axios';
+import { withTracker } from 'meteor/react-meteor-data';
 
-export default function About(props){
+function Asset(props){
     let { assetID } = useParams();
-    const [assetInfo, setAssetInfo] = useState({rent: 100, assetName: "", assetTotal: 0, current_owner: "", url: ""});
+    const [assetInfo, setAssetInfo] = useState({rent: 0, assetName: "", assetTotal: 0, current_owner: "", url: ""});
 
     useEffect(() => { 
       const fetchData = async () => {
@@ -16,8 +17,19 @@ export default function About(props){
         console.log(assetInfoAlgo);
         // works in Chrome inspector
         // PVContracts.find({"assetID": parseInt("59447432")}).fetch()
-        let contracts = PVContracts.find({"assetID": parseInt(assetID)}).fetch();
+        let contracts = props.contracts.filter((contract) => contract.assetID == parseInt(assetID));
         const ipfsID = assetInfoAlgo.params.url;
+        console.log(contracts)
+        if(contracts.length == 0){
+          return;
+        }
+        const rent = contracts[0].rent;
+        const current_owner = contracts[0].current_owner;
+        let assetInfo = {rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner, url: ""}
+        console.log(assetInfo);
+        setAssetInfo(assetInfo);
+
+        // can take long because public ipfs gateway is slow sometimes
         let metadata = {};
         await axios({
           method: "get",
@@ -32,9 +44,7 @@ export default function About(props){
       
         console.log(metadata.file_url)
         const url = metadata.file_url;
-        const rent = contracts[0].rent;
-        const current_owner = contracts[0].current_owner;
-        const assetInfo = {rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner, url}
+        assetInfo = {rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner, url}
         console.log(assetInfo);
         setAssetInfo(assetInfo);
       }
@@ -42,7 +52,7 @@ export default function About(props){
       fetchData()
         .then(()=>console.log(assetInfo))
         .catch(console.error);
-    }, []);
+    }, [props.contracts]);
 
     const ipfsURL = assetInfo.url;
     return (
@@ -63,3 +73,12 @@ export default function About(props){
     );
 
 }
+
+const AssetTracked = withTracker(({ }) => {
+  const contracts = PVContracts.find().fetch();
+  return {
+    contracts,
+  };
+})(Asset);
+
+export default AssetTracked;
