@@ -55,7 +55,7 @@ export default class Mint extends Component {
                         <div className="field-body">
                           <div className="field">
                             <div className="control is-expanded has-icons-left">
-                              <input defaultValue="Zurich PV Caesar-Ritz-Strasse 5" className="input" id="assetNameField" />
+                              <input maxLength="30" defaultValue="Zurich PV Caesar-Ritz-Strasse 5" className="input" id="assetNameField" />
                               <div className="icon is-small is-left">
                                 <i className="fas fa-signature"></i>
                               </div>
@@ -73,6 +73,36 @@ export default class Mint extends Component {
                             <form method="post" encType="multipart/form-data" action="/asset_upload">
                                 <input className="input" type="file" name="file" id="imageUpload"/>
                             </form>
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-signature"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Monthly rent</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                              <input defaultValue={8} className="input" type="numeric" name="rent" id="rent"/>
+                              <div className="icon is-small is-left">
+                                <i className="fas fa-signature"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="field is-horizontal">
+                        <div className="field-label is-normal">
+                          <label className="label">Customer ID (wallet address)</label>
+                        </div>
+                        <div className="field-body">
+                          <div className="field">
+                            <div className="control is-expanded has-icons-left">
+                              <input defaultValue={"D3MSQ7UFLE7UEGHGMUZZW7OKPGX4HTOVCJY6FF3IJLYUZOLAYEES2N4JWU"} className="input" name="customer" id="customer"/>
                               <div className="icon is-small is-left">
                                 <i className="fas fa-signature"></i>
                               </div>
@@ -102,7 +132,7 @@ export default class Mint extends Component {
                         <div className="field-body">
                           <div className="field">
                             <div className="control is-expanded has-icons-left">
-                              <input defaultValue={10} className="input" id="assetTotalUnitsField" />
+                              <input defaultValue={1} className="input" id="assetTotalUnitsField"/>
                               <div className="icon is-small is-left">
                                 <i className="fas fa-coins"></i>
                               </div>
@@ -241,6 +271,10 @@ async function signAndSendTransaction() {
         "'>View on AlgoExplorer</a> "+"or <a target=&quot;_blank&quot; href='https://peer2panel.com/assets/"+tx.assetID+"'>view on Peer2Panel</a>.";
       document.getElementById('errorDialog').classList.add("is-hidden");
       document.getElementById('successDialog').classList.remove("is-hidden");
+
+      const rent = document.getElementById('rent').value;
+      const customer = document.getElementById('customer').value;
+      PVContracts.insert({"current_owner": from, assetName, assetID: tx.assetID, rent, customer});
       hideProcessingModal();
     })
     .catch((e) => {

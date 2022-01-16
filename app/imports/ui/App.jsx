@@ -64,11 +64,17 @@ class App extends Component  {
                 path: `/v2/assets/${assets[i]['asset-id']}`
               });
               console.log(assetInfo);
-              const pvasset = PVAssets.findOne({assetID: assets[i]['asset-id']}) || {rent: 100};
-              console.log(pvasset);
-              const rent = pvasset.rent;
-              accountsData.assets[i] = {...accountsData.assets[i], ...assetInfo, rent};  
+              const pvasset = PVContracts.findOne({assetID: assets[i]['asset-id']});
+              if(pvasset){
+                console.log(pvasset);
+                const rent = pvasset.rent;
+                accountsData.assets[i] = {...accountsData.assets[i], ...assetInfo, rent};  
+              }
+              else{
+                accountsData.assets[i] = null;
+              }
             };
+            accountsData.assets = accountsData.assets.filter((el)=>el);
             return accountsData;
           })
           .then((accountsData) => {
@@ -77,9 +83,9 @@ class App extends Component  {
             if(contracts.length == 0){
               // for demo we use fake data
               contracts = [
-                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 57939801, rent: 800},
-                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 58331139, rent: 1000},
-                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 58547046, rent: 700},
+                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 57939801, rent: 8},
+                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 58331139, rent: 10},
+                {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetID: 58547046, rent: 7},
               ]
             }
             const assets = accountsData.assets;
@@ -105,7 +111,7 @@ class App extends Component  {
             <div className="modal-content">
               <div className="box">
                 <span id="processingMessage">Processing, please wait...</span>
-                <progress className="progress is-small is-primary mt-1" max="100">15%</progress>
+                <progress className="progress is-small is-primary mt-1" max="100">20%</progress>
               </div>
             </div>
           </div>

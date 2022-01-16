@@ -31,11 +31,12 @@ module.exports = function () {
    * @param {string} contractOwner The wallet address of the contract owner
    * @returns {string} The address of the created offer contract
    */
-  this.createPVLimitContract = async function (contractOwner, price) {
+  this.createPVLimitContract = async function (contractOwner, price, assetID) {
     console.log("createPVLimitContract")
-    console.log(price)
+    console.log(price);
     if(price==''){price = 1;}
-    console.log(contractOwner)
+    console.log(contractOwner);
+    console.log(assetID);
 
     // create the client
     let algodClient = new algosdk.Algodv2(token, server, port);
@@ -46,13 +47,14 @@ module.exports = function () {
 
     let ratn = parseInt(1); // 1 PV
     let ratd = parseInt(1000000*parseInt(price)/100); // for 1 Algo -- divided by 100 for demo due to limited Algos from faucet
-    let assetID = 42004617; // ID of the PV asset
     let minTrade = 9999; // minimum number of microAlgos to accept
     let expiryRound = txParams.lastRound + parseInt(10000);
     let maxFee = 2000; // we set the max fee to avoid account bleed from excessive fees
 
     console.log(`Creating limit order contract...`);
+
     // create the limit contract template
+    assetID = parseInt(assetID);
     let limit = new limitTemplate.LimitOrder(contractOwner, assetID, ratn, ratd,
       expiryRound, minTrade, maxFee);
 
@@ -80,9 +82,8 @@ module.exports = function () {
     // so that's a total of 102,000 microAlgos
 
     console.log(`Reconstituting PV owner account from private key...`);
+
     let assetOwner = algosdk.mnemonicToSecretKey(PVAccountMnemonic);
-
-
     console.log(`Funding contract with the minimum amount of µAlgos required...`);
     let note = algosdk.encodeObj("Contract funding transaction");
     let fundingTx = algosdk.makePaymentTxnWithSuggestedParams(assetOwner.addr,
@@ -90,6 +91,7 @@ module.exports = function () {
     let signedFundingTx = fundingTx.signTxn(assetOwner.sk);
     let resultTx = (await algodClient.sendRawTransaction(signedFundingTx).do());
     await algoutils.waitForConfirmation(algodClient, resultTx.txId);
+
     console.log(`Transaction confirmed. Funding transaction ID: ${resultTx.txId}`);
 
     // return the NFT Offer's address on the blockchain

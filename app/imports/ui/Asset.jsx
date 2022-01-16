@@ -14,13 +14,9 @@ export default function About(props){
           path: `/v2/assets/${assetID}`
         });
         console.log(assetInfoAlgo);
-        const pvasset = PVAssets.findOne({assetID}) || {rent: 100};
-        let contracts = PVContracts.find({assetID}).fetch();
-        if(contracts.length == 0){
-          contracts = [
-            {"current_owner": "MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU", assetName: "Susanne's PV", assetTotal: 10, assetID: 57939801, rent: 800},
-          ]
-        }
+        // works in Chrome inspector
+        // PVContracts.find({"assetID": parseInt("59447432")}).fetch()
+        let contracts = PVContracts.find({"assetID": parseInt(assetID)}).fetch();
         const ipfsID = assetInfoAlgo.params.url;
         let metadata = {};
         await axios({
@@ -36,7 +32,9 @@ export default function About(props){
       
         console.log(metadata.file_url)
         const url = metadata.file_url;
-        const assetInfo = {rent: pvasset.rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner: contracts[0].current_owner, url}
+        const rent = contracts[0].rent;
+        const current_owner = contracts[0].current_owner;
+        const assetInfo = {rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner, url}
         console.log(assetInfo);
         setAssetInfo(assetInfo);
       }
@@ -56,7 +54,7 @@ export default function About(props){
               <div>Name: {assetInfo.assetName}</div>
               <div>Total: {assetInfo.assetTotal}</div>
               <div>Current owner: <span style={{fontSize: "12px"}}>{assetInfo.current_owner}</span></div>
-              <div>Monthly rent: {assetInfo.rent} USDC</div>
+              <div>Monthly rent: {assetInfo.rent} USD</div>
               <div><img src={ipfsURL}/></div>
             </div>
           </div>

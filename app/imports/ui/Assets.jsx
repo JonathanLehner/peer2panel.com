@@ -27,7 +27,7 @@ export default class Assets extends Component {
     const contracts = this.props.contracts;
     const selected_contract = contracts[index];
     console.log(selected_contract);
-    this.setState({selectedReceiver: 0, priceField_value: selected_contract.rent*100, receiverField_value: selected_contract.current_owner});
+    this.setState({selectedReceiver: 0, priceField_value: selected_contract.rent*0.72, receiverField_value: selected_contract.current_owner});
   }
 
   render() {
@@ -45,12 +45,12 @@ export default class Assets extends Component {
               <h1 className="title">Asset management</h1>
 
               <p className="subtitle">
-                Pay or receive rent for your asset-backed PV tokens. The rent includes a 15% maintenance fee which is automatically sent to Peer2Panel by the smart contract.
+                Pay or receive rent for your asset-backed PV tokens. The rent includes a 20% maintenance fee which is automatically sent to Peer2Panel by the smart contract.
               </p>
               <p>PV tokens are only valid created by Peer2Panel admin address "D3MSQ7UFLE7UEGHGMUZZW7OKPGX4HTOVCJY6FF3IJLYUZOLAYEES2N4JWU".</p>
 
               <h5>My PV installations - pay rent</h5>
-              <p>Some exchanges like Binance do not support USDC on Algorand yet. We recommend <a href="https://www.huobi.com/" target="_blank">Huobi</a>.</p>
+              <p>Some exchanges like Binance do not support USDC on Algorand yet. So we calculate the amount of ALGOs that should be sent every month. {/*We recommend <a href="https://www.huobi.com/" target="_blank">Huobi</a>.*/}</p>
               {accountsData == null ? 
                 <button className="button" id="btnRefreshAccounts" onClick={this.props.fetchAcc}>Authenticate</button>
                 : <div>
@@ -58,7 +58,7 @@ export default class Assets extends Component {
                       <tbody>
                         <tr><th>Current owner</th><th>Asset name</th><th>Asset ID</th><th>Monthly rent</th><th></th></tr>
                         {contracts && contracts.map((asset, index)=>{
-                          return (<tr key={asset.assetID}><td>{asset.current_owner.substr(0,12)}...</td><td>{asset.assetName}</td><td><a target="_blank" href={`/assets/${asset.assetID}`}>{asset.assetID}</a></td><td>{asset.rent} USDC</td><td><a href="#" onClick={()=>this.select(index)}>pay now</a></td></tr>)
+                          return (<tr key={asset.assetID}><td>{asset.current_owner.substr(0,12)}...</td><td>{asset.assetName}</td><td><a target="_blank" href={`/assets/${asset.assetID}`}>{asset.assetID}</a></td><td>{asset.rent} USD ~ {(asset.rent*0.72).toFixed(2)} ALGO</td><td><a href="#" onClick={()=>this.select(index)}>pay now</a></td></tr>)
                         })}  
                       </tbody>
                     </table>
@@ -78,7 +78,11 @@ export default class Assets extends Component {
                       <tbody>
                         <tr><th>Account</th><th>Asset name</th><th>Asset ID</th><th>Monthly rent</th><th></th></tr>
                         {solar_assets && solar_assets.map((asset)=>{
-                          return (<tr key={asset['asset-id']}><td>{this.props.accountsData[0].address.substr(0,12)}...</td><td>{asset.params['name']}</td><td><a target="_blank" href={`/assets/${asset['asset-id']}`}>{asset['asset-id']}</a></td><td>{asset.rent} USDC</td></tr>)
+                          return (<tr key={asset['asset-id']}>
+                            <td>{this.props.accountsData[0].address.substr(0,12)}...</td>
+                            <td>{asset.params['name']}</td>
+                            <td><a target="_blank" href={`/assets/${asset['asset-id']}`}>{asset['asset-id']}</a></td>
+                            <td>{asset.rent} USD</td></tr>)
                         })}                     
                       </tbody>
                     </table>
@@ -105,7 +109,12 @@ function executeSplitTransaction() {
   let amount = document.getElementById('priceField').value;
   let contractAddress = null;
 
-  if(amount * ratio1 / 100 < 300 || amount * ratio2 / 100 < 300) {
+  // be careful about "Error: could not split funds in a way that satisfied the contract ratio"
+  amount = amount*1000000; // in microalgo
+  if(amount % 5 != 0){
+    amount = amount+(5-amount%5);
+  }
+  if(amount * ratio1 < 300 || amount * ratio2 < 300) {
     alert("The amount each recipient is paid must be at least 3000 µAlgos.");
     document.getElementById('successDialog').classList.add("is-hidden");
     document.getElementById('errorDialog').classList.remove("is-hidden");
@@ -141,9 +150,11 @@ function executeSplitTransaction() {
     .then((txParams) => {
       console.log(txParams);
       let sdkTx = new algosdk.Transaction({
+        //assetIndex: 10458941,
+        //type: 'axfer',  // ASA Transfer (axfer)
         from: sender,
         to: contractAddress,
-        amount: +amount + 100000 + (txParams['min-fee'] * 2),
+        amount: +amount + 100000 + (txParams['min-fee'] * 2), // 100000 is minimum balance
         //note: 'Payment to split', //note must be a Uint8Array.
         type: 'pay', // Payment (pay)
         fee: txParams['min-fee'],
@@ -218,6 +229,8 @@ function balancePercentageFields(sender) {
 }
 
 function PaymentForm(props) {
+  console.log("Paymentform")
+  console.log(props)
   return (
     <div>
               <div className="columns">
@@ -256,9 +269,7 @@ function PaymentForm(props) {
                         <div className="control is-expanded has-icons-left">
                           <div className="select is-fullwidth">
                             <select id="receiverAField" value={props.receiverField_value} disabled>
-                              <option value="-1">Select contract above</option>
-                              <option value="PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4">PGPN6HSIXJT73IHLCSAH74NQB2KRGGZP3IPX5XKXA46LUIVOSOEYL3TOI4</option>
-                              <option value="MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU">MXGQURRN2EDHAEXDXEE4H7XIDA4Q7PUSSXEXCC3Q2ABSKAKCHCLBRF46WU</option>    
+                              <option value={props.receiverField_value}>{props.receiverField_value}</option>
                             </select>
                           </div>
                           <div className="icon is-small is-left">
@@ -274,7 +285,7 @@ function PaymentForm(props) {
                     <div className="field-body">
                       <div className="field">
                         <div className="control is-expanded has-icons-left">
-                          <input id="percentOfPaymentAField" className="input" type="number" value="85" onChange={()=>balancePercentageFields(this.id)} disabled />
+                          <input id="percentOfPaymentAField" className="input" type="number" value="80" onChange={()=>balancePercentageFields(this.id)} disabled />
                           <div className="icon is-small is-left">
                             <i className="fas fa-percent"></i>
                           </div>
@@ -311,7 +322,7 @@ function PaymentForm(props) {
                     <div className="field-body">
                       <div className="field">
                         <div className="control is-expanded has-icons-left">
-                          <input id="percentOfPaymentBField" className="input" type="number" value="15" disabled
+                          <input id="percentOfPaymentBField" className="input" type="number" value="20" disabled
                             onChange={()=>balancePercentageFields(this.id)} />
                           <div className="icon is-small is-left">
                             <i className="fas fa-percent"></i>

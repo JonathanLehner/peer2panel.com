@@ -93,7 +93,7 @@ app.get('/createPVLimitContract', (req, response) => {
   console.log(code);
   console.log(options)
 
-  createPVLimitContract(options['account'], options['price'])
+  createPVLimitContract(options['account'], options['price'], options['assetID'])
     .then((data) => {
       response.write(JSON.stringify({
         "contractAddress": data
@@ -309,9 +309,9 @@ const scenario1 = async (nftFile, nftFileName, assetName, assetDesc) => {
   metadata.name = `${assetName}@arc3`;
   metadata.description = assetDesc;
   metadata.image = `ipfs://${resultFile.IpfsHash}`;
-  metadata.image_integrity = `sha256-${integrity.base64}`;;
+  metadata.image_integrity = `sha256-${integrity.base64}`;
   metadata.image_mimetype = `${fileCat}/${fileExt}`;
-  metadata.external_url = "https://mysongs.com/song/mysong",
+  metadata.external_url = "https://demo.peer2panel.com/";
 
   console.log('Algorand NFT::ARC3::IPFS scenario 1: The NFT prepared metadata: ', metadata);
 
