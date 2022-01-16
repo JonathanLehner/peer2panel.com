@@ -7,13 +7,6 @@ const algosdk = require("algosdk");
 class Trade extends Component {
   state = {
     counter: 0,
-    dexData: [
-      {address: "PGPN6HSIXJT73IHLCSAH", assetID: 59435980, location: "PV Zurich 1", price: "80", rent: "10", contractID: ""},
-      {address: "PGPN6HSIXJT73IHLCSAH", assetID: 59435980, location: "PV Zurich 1", price: "88", rent: "11", contractID: ""},
-      {address: "PGPN6HSIXJT73IHLCSAH", assetID: 59435980, location: "PV Zurich 5", price: "85", rent: "14", contractID: ""},
-      {address: "PGPN6HSIXJT73IHLCSAH", assetID: 59435980, location: "PV Zurich 3", price: "80", rent: "10", contractID: ""},
-      {address: "PGPN6HSIXJT73IHLCSAH", assetID: 59435980, location: "PV Zurich 7", price: "83", rent: "12", contractID: ""},
-    ],
     priceField_value: 0,
     contractField_value: 0,
     selectedIndex: -1,
@@ -60,7 +53,7 @@ class Trade extends Component {
   createLimitContract() {
     let paymentAccount = document.getElementById('paymentAccountField').value;
     let price = document.getElementById('priceField').value;
-    let assetID = document.getElementById('assetField').value;
+    let assetID = parseInt(document.getElementById('assetField').value);
     let contractAddress = null;
   
     showProcessingModal("Creating limit contract...");
@@ -92,14 +85,14 @@ class Trade extends Component {
         })
         }
       )
-      // opt in to PV
+      // send PV token to contract
       .then((txParams) => {
         console.log(txParams);
         let sdkTx = new algosdk.Transaction({ //signTxn
           assetIndex: assetID,
           from: paymentAccount,
-          amount: 0,
-          to: paymentAccount,
+          amount: 1,
+          to: "7H2A2LV4ZWZPZQ3CWAAXTGDSESNK4SBJIGXDTG45IRKVDTIFMUNYNYHH7A",
           type: 'axfer',  // ASA Transfer (axfer)
           fee: txParams['min-fee'],
           firstRound: txParams['last-round'],
@@ -130,10 +123,13 @@ class Trade extends Component {
         return snd;
       }
       )
+      // wait for confirmation from the blockchain
+      .then((tx) => waitForAlgosignerConfirmation(tx))
       .then(() => {
         const assetInfo = this.props.assets.find(asset => asset['asset-id'] == assetID);
         const rent = assetInfo.rent;
-        PVListings.insert({address: paymentAccount, assetID, location: "", price, rent, contractAddress})
+
+        PVListings.insert({address: paymentAccount, assetID, location: assetInfo.params.name, price, rent, contractAddress})
         hideProcessingModal();
         }
       )
@@ -203,11 +199,12 @@ class Trade extends Component {
     }))
     // pay for PV
     .then((txParams) => {
+      console.log("next transaction")
       console.log(txParams);
       let sdkTx = new algosdk.Transaction({
         from: paymentAccount,
         to: contractAddress,
-        amount: +1000000,
+        amount: +1000000*price,
         //note: 'Pay for PV', // note must be a Uint8Array.
         type: 'pay',  // Payment (pay)
         fee: txParams['min-fee'],
@@ -250,6 +247,8 @@ class Trade extends Component {
           "'>View on AlgoExplorer</a>";
         document.getElementById('successDialog').classList.remove("is-hidden");
         document.getElementById('errorDialog').classList.add("is-hidden");
+        this.setState({selectedIndex: -1});
+        PVListings.remove({_id: asset['_id']});
       }
 
       hideProcessingModal();

@@ -120,7 +120,7 @@ app.get('/executePVLimitContract', (req, response) => {
   console.log(options)
 
   const code = require('./limitorder')();
-  console.log(code);
+  //console.log(code);
 
   executePVLimitContract(options['address'], options['price'])
     .then((data) => {
