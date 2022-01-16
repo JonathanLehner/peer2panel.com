@@ -8,45 +8,45 @@ function Asset(props){
     const [assetInfo, setAssetInfo] = useState({rent: 0, assetName: "", assetTotal: 0, current_owner: "", url: ""});
 
     useEffect(() => { 
-      const fetchData = async () => {
-        console.log("fetching data "+assetID);
-        const assetInfoAlgo = await AlgoSigner.algod({
-          ledger: 'TestNet',
-          path: `/v2/assets/${assetID}`
-        });
-        console.log(assetInfoAlgo);
+      const fetchData = async () => {    
         // works in Chrome inspector
         // PVContracts.find({"assetID": parseInt("59447432")}).fetch()
         let contracts = props.contracts.filter((contract) => contract.assetID == parseInt(assetID));
-        const ipfsID = assetInfoAlgo.params.url;
         console.log(contracts)
-        if(contracts.length == 0){
-          return;
-        }
-        const rent = contracts[0].rent;
-        const current_owner = contracts[0].current_owner;
-        let assetInfo = {rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner, url: ""}
-        console.log(assetInfo);
-        setAssetInfo(assetInfo);
+        if(contracts.length > 0){
+          console.log("fetching data "+assetID);
+          const assetInfoAlgo = await AlgoSigner.algod({
+            ledger: 'TestNet',
+            path: `/v2/assets/${assetID}`
+          });
+          console.log(assetInfoAlgo);
+          const ipfsID = assetInfoAlgo.params.url;
 
-        // can take long because public ipfs gateway is slow sometimes
-        let metadata = {};
-        await axios({
-          method: "get",
-          url: `https://ipfs.io/ipfs/${ipfsID.substr(7)}`,
-        })
-        .then(function (resp) {
-          metadata = resp.data.properties;
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-      
-        console.log(metadata.file_url)
-        const url = metadata.file_url;
-        assetInfo = {rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner, url}
-        console.log(assetInfo);
-        setAssetInfo(assetInfo);
+          const rent = contracts[0].rent;
+          const current_owner = contracts[0].current_owner;
+          let assetInfo = {rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner, url: ""}
+          console.log(assetInfo);
+          setAssetInfo(assetInfo);
+
+          // can take long because public ipfs gateway is slow sometimes
+          let metadata = {};
+          await axios({
+            method: "get",
+            url: `https://ipfs.io/ipfs/${ipfsID.substr(7)}`,
+          })
+          .then(function (resp) {
+            metadata = resp.data.properties;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        
+          console.log(metadata.file_url)
+          const url = metadata.file_url;
+          assetInfo = {rent, assetName: assetInfoAlgo.params.name, assetTotal: assetInfoAlgo.params.total, current_owner, url}
+          console.log(assetInfo);
+          setAssetInfo(assetInfo);
+        }
       }
     
       fetchData()
