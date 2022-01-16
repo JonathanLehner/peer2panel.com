@@ -5,7 +5,7 @@ Renewable energy is necessary to avoid climate change. Installations have a high
 jonathan.lehner@peer2panel.com
 
 # License
-Cannot be used commercially without permission.
+Cannot be used commercially without permission. AGPL license can be used according to the requirements of hackathons.
 
 # FAQ
-- How do you prevent crime? We do not handle fiat onboarding. KYC is handled by the exchanges for obtaining cryptocurrency. In case we are alerted to fraud or money laundering we will freeze and invalidated the corresponding NFTs.
+- How do you prevent crime? We do not handle fiat onboarding. KYC is handled by the exchanges for obtaining cryptocurrency. In case we are alerted to fraud or money laundering we will freeze and invalidate the corresponding NFTs with the freeze functionality of Algorand Standard Assets.
