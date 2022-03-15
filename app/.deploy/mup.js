@@ -3,9 +3,9 @@ module.exports = {
   servers: {
     one: {
       // TODO: set host address, username, and authentication method
-      host: '104.248.22.84',
-      username: 'root',
-      pem: '~/.ssh/id_rsa'
+      host: '54.90.76.83',
+      username: 'ubuntu',
+      pem: '~/Downloads/rl.pem' //'~/.ssh/id_rsa'
     }
   },
 
@@ -77,7 +77,7 @@ module.exports = {
       // Enable let's encrypt to create free certificates.
       // The email is used by Let's Encrypt to notify you when the
       // certificates are close to expiring.
-      letsEncryptEmail: 'jonathan@mail.milliwayszurich.com',
+      letsEncryptEmail: 'jonathan.lehner@peer2panel.com',
       forceSSL: true 
     }
   }
